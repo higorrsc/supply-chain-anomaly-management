@@ -7,6 +7,7 @@ from .exceptions import (
     EntityNotFoundError,
     EntityValidationError,
 )
+from .protocols import ActivatableEntity
 from .repository import AbstractRepository, Page, PageRequest, SearchCriteria
 from .value_object import AbstractValueObject
 
@@ -14,6 +15,7 @@ __all__ = [
     "AbstractEntity",
     "AbstractRepository",
     "AbstractValueObject",
+    "ActivatableEntity",
     "BusinessRuleViolationError",
     "ConflictError",
     "DomainError",
