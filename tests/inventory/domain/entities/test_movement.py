@@ -5,9 +5,9 @@ from uuid import UUID
 import pytest
 from faker import Faker
 
-from src.core.domain import EntityValidationError
 from src.inventory.domain.entities import Movement
 from src.inventory.domain.enums import MovementType
+from src.inventory.domain.exceptions import InvalidMovementError
 from src.inventory.domain.value_objects import Quantity
 
 
@@ -36,7 +36,7 @@ class TestMovement:
 
         fake = Faker()
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidMovementError) as exc_info:
             Movement(
                 item_id="0000-0000",  # type: ignore
                 warehouse_id=fake.uuid4(cast_to=None),
@@ -54,7 +54,7 @@ class TestMovement:
 
         fake = Faker()
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidMovementError) as exc_info:
             Movement(
                 item_id=fake.uuid4(cast_to=None),
                 warehouse_id="0000-0000",  # type: ignore
@@ -70,7 +70,7 @@ class TestMovement:
 
         fake = Faker()
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidMovementError) as exc_info:
             Movement(
                 item_id=fake.uuid4(cast_to=None),
                 warehouse_id=fake.uuid4(cast_to=None),
@@ -86,7 +86,7 @@ class TestMovement:
 
         fake = Faker()
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidMovementError) as exc_info:
             Movement(
                 item_id=fake.uuid4(cast_to=None),
                 warehouse_id=fake.uuid4(cast_to=None),

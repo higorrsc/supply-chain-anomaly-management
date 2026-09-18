@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID
 
-from src.core.domain import AbstractEntity, EntityValidationError
+from src.core.domain import AbstractEntity
 from src.inventory.domain.enums import MovementType
 from src.inventory.domain.events import MovementCreatedEvent
+from src.inventory.domain.exceptions import InvalidMovementError
 from src.inventory.domain.value_objects import Quantity
 
 
@@ -21,18 +22,18 @@ class Movement(AbstractEntity):
     def validate(self) -> None:
         """Validate movement creation"""
 
-        if not (isinstance(self.item_id, UUID)):
-            raise EntityValidationError("Item ID must be a valid UUID.")
+        if not isinstance(self.item_id, UUID):
+            raise InvalidMovementError("Item ID must be a valid UUID.")
 
-        if not (isinstance(self.warehouse_id, UUID)):
-            raise EntityValidationError("Warehouse ID must be a valid UUID.")
+        if not isinstance(self.warehouse_id, UUID):
+            raise InvalidMovementError("Warehouse ID must be a valid UUID.")
 
         if self.occurred_at.tzinfo is None:
-            raise EntityValidationError("Occurrence date must be timezone-aware.")
+            raise InvalidMovementError("Occurrence date must be timezone-aware.")
 
         now = datetime.now(UTC)
         if self.occurred_at > now:
-            raise EntityValidationError("Occurrence date cannot be in the future.")
+            raise InvalidMovementError("Occurrence date cannot be in the future.")
 
     def __post_init__(self) -> None:
         """Validate and register domain events after initialization."""

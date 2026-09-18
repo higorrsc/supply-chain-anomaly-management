@@ -1,8 +1,8 @@
 import pytest
 from faker import Faker
 
-from src.core.domain import EntityValidationError
 from src.inventory.domain.entities import Warehouse
+from src.inventory.domain.exceptions import InvalidWarehouseError
 
 
 class TestWarehouse:
@@ -33,7 +33,7 @@ class TestWarehouse:
     def test_if_can_create_warehouse_without_name_raises_error(self) -> None:
         """Test if can create an warehouse without pass name"""
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             Warehouse(
                 name="",
                 location_code="warehouse_location",
@@ -42,7 +42,7 @@ class TestWarehouse:
 
         assert "Name must be a non-empty string." in str(exc_info)
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             Warehouse(
                 name=None,  # type: ignore
                 location_code="warehouse_location",
@@ -54,7 +54,7 @@ class TestWarehouse:
     def test_if_can_create_warehouse_without_location_code_raises_error(self) -> None:
         """Test if can create an warehouse without pass location code"""
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             Warehouse(
                 name="warehouse_name",
                 location_code="",
@@ -63,7 +63,7 @@ class TestWarehouse:
 
         assert "Location Code must be a non-empty string." in str(exc_info)
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             Warehouse(
                 name="warehouse_name",
                 location_code=None,  # type: ignore
@@ -112,7 +112,7 @@ class TestWarehouse:
         assert warehouse is not None
         assert warehouse.is_active is True
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             warehouse.activate()
 
         assert "Warehouse already active." in str(exc_info)
@@ -129,7 +129,7 @@ class TestWarehouse:
         assert warehouse is not None
         assert warehouse.is_active is False
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidWarehouseError) as exc_info:
             warehouse.deactivate()
 
         assert "Warehouse already inactive." in str(exc_info)

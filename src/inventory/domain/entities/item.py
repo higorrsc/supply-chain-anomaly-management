@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from src.core.domain import AbstractEntity, EntityValidationError
+from src.core.domain import AbstractEntity
+from src.inventory.domain.exceptions import InvalidItemError
 from src.inventory.domain.value_objects import SKU
 
 
@@ -16,13 +17,13 @@ class Item(AbstractEntity):
         """Validate item creation"""
 
         if not self.description or not self.description.strip():
-            raise EntityValidationError("Description must be a non-empty string.")
+            raise InvalidItemError("Description must be a non-empty string.")
 
     def deactivate(self) -> None:
         """Inactivate the item."""
 
         if not self.is_active:
-            raise EntityValidationError("Item already inactive.")
+            raise InvalidItemError("Item already inactive.")
 
         self.is_active = False
 
@@ -30,6 +31,6 @@ class Item(AbstractEntity):
         """Activate the item."""
 
         if self.is_active:
-            raise EntityValidationError("Item already active.")
+            raise InvalidItemError("Item already active.")
 
         self.is_active = True

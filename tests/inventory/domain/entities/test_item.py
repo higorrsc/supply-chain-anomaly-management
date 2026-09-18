@@ -1,8 +1,8 @@
 import pytest
 from faker import Faker
 
-from src.core.domain import EntityValidationError
 from src.inventory.domain.entities import Item
+from src.inventory.domain.exceptions import InvalidItemError
 from src.inventory.domain.value_objects import SKU
 
 
@@ -30,7 +30,7 @@ class TestItem:
     def test_if_can_create_item_without_description_raises_error(self) -> None:
         """Test if can create an item without pass description"""
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidItemError) as exc_info:
             Item(
                 sku=SKU(value="CEL-XIAO-123"),
                 description="",
@@ -39,7 +39,7 @@ class TestItem:
 
         assert "Description must be a non-empty string." in str(exc_info)
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidItemError) as exc_info:
             Item(
                 sku=SKU(value="CEL-XIAO-123"),
                 description=None,  # type: ignore
@@ -85,7 +85,7 @@ class TestItem:
         assert item.sku.value == "CEL-XIAO-123"
         assert item.is_active is True
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidItemError) as exc_info:
             item.activate()
 
         assert "Item already active." in str(exc_info)
@@ -103,7 +103,7 @@ class TestItem:
         assert item.sku.value == "CEL-XIAO-123"
         assert item.is_active is False
 
-        with pytest.raises(EntityValidationError) as exc_info:
+        with pytest.raises(InvalidItemError) as exc_info:
             item.deactivate()
 
         assert "Item already inactive." in str(exc_info)

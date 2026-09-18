@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from src.core.domain import AbstractEntity, EntityValidationError
+from src.core.domain import AbstractEntity
+from src.inventory.domain.exceptions import InvalidWarehouseError
 
 
 @dataclass(kw_only=True, eq=False, repr=False)
@@ -15,16 +16,16 @@ class Warehouse(AbstractEntity):
         """Validate item creation"""
 
         if not self.name or not self.name.strip():
-            raise EntityValidationError("Name must be a non-empty string.")
+            raise InvalidWarehouseError("Name must be a non-empty string.")
 
         if not self.location_code or not self.location_code.strip():
-            raise EntityValidationError("Location Code must be a non-empty string.")
+            raise InvalidWarehouseError("Location Code must be a non-empty string.")
 
     def deactivate(self) -> None:
         """Inactivate the warehouse."""
 
         if not self.is_active:
-            raise EntityValidationError("Warehouse already inactive.")
+            raise InvalidWarehouseError("Warehouse already inactive.")
 
         self.is_active = False
 
@@ -32,6 +33,6 @@ class Warehouse(AbstractEntity):
         """Activate the warehouse."""
 
         if self.is_active:
-            raise EntityValidationError("Warehouse already active.")
+            raise InvalidWarehouseError("Warehouse already active.")
 
         self.is_active = True
