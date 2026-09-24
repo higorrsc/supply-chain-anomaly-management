@@ -1,6 +1,7 @@
 from .activate_item import ActivateItemUseCase
 from .activate_warehouse import ActivateWarehouseUseCase
 from .create_item import CreateItemUseCase
+from .create_movement import CreateMovementUseCase
 from .create_warehouse import CreateWarehouseUseCase
 from .deactivate_item import DeactivateItemUseCase
 from .deactivate_warehouse import DeactivateWarehouseUseCase
@@ -13,6 +14,7 @@ __all__ = [
     "ActivateItemUseCase",
     "ActivateWarehouseUseCase",
     "CreateItemUseCase",
+    "CreateMovementUseCase",
     "CreateWarehouseUseCase",
     "DeactivateItemUseCase",
     "DeactivateWarehouseUseCase",

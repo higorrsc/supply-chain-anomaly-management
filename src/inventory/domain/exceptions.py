@@ -19,5 +19,9 @@ class InvalidWarehouseError(EntityValidationError):
     """Exception raised when an Warehouse is not valid."""
 
 
+class MovementNotFoundError(EntityNotFoundError):
+    """Exception raised when a Movement is not found in the repository."""
+
+
 class InvalidMovementError(EntityValidationError):
     """Exception raised when an Movement is not valid."""
