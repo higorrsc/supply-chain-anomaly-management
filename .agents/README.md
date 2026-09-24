@@ -4,20 +4,26 @@
 
 Hooks enforce project rules automatically:
 
-- command safety
-- quality gates
-- formatting
-- database migration reminders
-- final repository validation
+- block-dangerous-commands
+- check-alembic
+- check-database-changes
+- debug-env
+- final-check
+- pre-commit-check
+- python-format
+- test-hooks
 
 ## Skills
 
 Skills provide specialized workflows:
 
-- git-flow
-- commit-and-open-pr
-- release-management
-- changelog
-- fastapi
 - clean-ddd-hexagonal
+- fastapi
+- openspec-apply-change
+- openspec-archive-change
+- openspec-explore
+- openspec-propose
+- openspec-sync-specs
+- openspec-update-change
+- pydantic
 - sqlalchemy-alembic-expert-best-practices-code-review
