@@ -1,7 +1,7 @@
 import pytest
 
 from src.core.domain import EntityNotFoundError, PageRequest, SearchCriteria
-from src.core.infrastructure.repository import InMemoryRepository
+from src.core.infrastructure.repositories import InMemoryRepository
 from tests.fakes import FakeEntity
 
 

@@ -9,6 +9,7 @@
     "mensageria",
     "mockadas",
     "mypy",
+    "nullable",
     "openspec",
     "postgres",
     "postgresql",

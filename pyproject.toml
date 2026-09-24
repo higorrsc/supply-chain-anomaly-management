@@ -7,7 +7,14 @@ authors = [
   { name = "Higor Rodrigues dos Santos Cruz", email = "higorrsc@gmail.com" },
 ]
 requires-python = ">=3.14,<3.15"
-dependencies = ["pydantic>=2.13.5", "pydantic-settings>=2.15.0"]
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "alembic>=1.20.0",
+    "asyncpg>=0.31.0",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy>=2.0.54",
+]
 
 [dependency-groups]
 dev = [
@@ -44,7 +51,7 @@ namespace_packages = true
 # Warnings
 warn_unused_configs = true
 # Exclusions
-exclude = ["alembic/versions"]
+exclude = ["migrations/versions"]
 
 
 # ------------------------------------------------------

@@ -6,7 +6,7 @@ from src.core.application.use_cases.queries import (
     GetByIdRequestDTO,
 )
 from src.core.domain import EntityNotFoundError
-from src.core.infrastructure.repository import InMemoryRepository
+from src.core.infrastructure.repositories import InMemoryRepository
 from tests.fakes.entity import FakeEntity
 
 

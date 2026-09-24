@@ -1,4 +1,4 @@
-from src.core.infrastructure.repository import InMemoryRepository
+from src.core.infrastructure.repositories import InMemoryRepository
 from src.inventory.domain.entities import Item
 from src.inventory.domain.repositories import IItemRepository
 from src.inventory.domain.value_objects import SKU

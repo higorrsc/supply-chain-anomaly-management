@@ -6,7 +6,7 @@ from src.core.application.use_cases.commands import (
     GenericDeactivateUseCase,
 )
 from src.core.domain import EntityNotFoundError, EntityValidationError
-from src.core.infrastructure.repository import InMemoryRepository
+from src.core.infrastructure.repositories import InMemoryRepository
 from tests.fakes import FakeEntity
 
 

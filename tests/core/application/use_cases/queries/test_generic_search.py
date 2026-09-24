@@ -2,7 +2,7 @@ from src.core.application.use_cases.queries import (
     GenericSearchUseCase,
     SearchRequestDTO,
 )
-from src.core.infrastructure.repository import InMemoryRepository
+from src.core.infrastructure.repositories import InMemoryRepository
 from tests.fakes.entity import FakeEntity
 
 
