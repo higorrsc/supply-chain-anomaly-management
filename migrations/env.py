@@ -6,11 +6,10 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+# Import all models here so they are registered with Base.metadata before autogenerate
+import src.inventory.infrastructure.models  # noqa
 from src.core.infrastructure.config.settings import Settings
 from src.core.infrastructure.database.base import Base
-from src.inventory.infrastructure.models.item_model import ItemModel
-# from src.inventory.infrastructure.models.warehouse_model import WarehouseModel
-# from src.inventory.infrastructure.models.movement_model import MovementModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
