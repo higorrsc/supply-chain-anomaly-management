@@ -1,3 +1,4 @@
+import asyncio
 from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import uuid4
@@ -116,3 +117,53 @@ class TestCreateMovementUseCase:
 
         with pytest.raises(WarehouseNotFoundError):
             await use_case.execute(dto)
+
+    async def test_execute_publishes_event(self) -> None:
+        """Test if the use case publishes MovementCreatedEvent."""
+        from src.core.infrastructure.events.dispatcher import AsyncEventDispatcher
+        from src.inventory.domain.events import MovementCreatedEvent
+
+        repo = FakeMovementRepository()
+        item_repo = FakeItemRepository()
+        warehouse_repo = FakeWarehouseRepository()
+        dispatcher = AsyncEventDispatcher()
+
+        received_events = []
+
+        async def handler(event):
+            received_events.append(event)
+
+        dispatcher.subscribe(MovementCreatedEvent, handler)
+
+        item = Item(sku=SKU(value="SKU-99999"), description="Item", is_active=True)
+        await item_repo.save(item)
+
+        warehouse = Warehouse(name="Warehouse", location_code="US", is_active=True)
+        await warehouse_repo.save(warehouse)
+
+        use_case = CreateMovementUseCase(
+            repository=repo,
+            item_repository=item_repo,
+            warehouse_repository=warehouse_repo,
+            event_dispatcher=dispatcher,
+        )
+
+        dto = CreateMovementRequestDTO(
+            item_id=item.id,
+            warehouse_id=warehouse.id,
+            quantity=Decimal("50.0"),
+            movement_type=MovementType.IN,
+            occurred_at=datetime.now(UTC),
+        )
+
+        result = await use_case.execute(dto)
+
+        await asyncio.sleep(0.01)
+        assert len(received_events) == 1
+        event = received_events[0]
+        assert isinstance(event, MovementCreatedEvent)
+        assert event.movement_id == result.id
+        assert event.item_id == item.id
+        assert event.warehouse_id == warehouse.id
+        assert event.quantity_value == "50.0"
+        assert event.movement_type == MovementType.IN

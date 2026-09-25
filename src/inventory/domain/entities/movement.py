@@ -45,6 +45,8 @@ class Movement(AbstractEntity):
             warehouse_id=self.warehouse_id,
             quantity_value=str(self.quantity.value),
             movement_type=self.movement_type,
+            movement_id=self.id,
+            occurrence_date=self.occurred_at,
         )
 
         self.add_domain_event(event)

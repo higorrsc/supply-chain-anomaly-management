@@ -4,6 +4,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.infrastructure.database.session import get_db_session
+from src.core.presentation.api.dependencies import get_event_dispatcher
+from src.core.domain.events import EventDispatcher
 from src.inventory.application.use_cases.commands import (
     ActivateItemUseCase,
     ActivateWarehouseUseCase,
@@ -51,6 +53,7 @@ def get_movement_repository(session: SessionDep) -> MovementRepository:
 ItemRepoDep = Annotated[ItemRepository, Depends(get_item_repository)]
 WarehouseRepoDep = Annotated[WarehouseRepository, Depends(get_warehouse_repository)]
 MovementRepoDep = Annotated[MovementRepository, Depends(get_movement_repository)]
+EventDispatcherDep = Annotated[EventDispatcher, Depends(get_event_dispatcher)]
 
 
 # Item Use Cases
@@ -121,10 +124,16 @@ def get_search_warehouse_use_case(repo: WarehouseRepoDep) -> SearchWarehouseUseC
 
 # Movement Use Cases
 def get_create_movement_use_case(
-    repo: MovementRepoDep, item_repo: ItemRepoDep, warehouse_repo: WarehouseRepoDep
+    repo: MovementRepoDep,
+    item_repo: ItemRepoDep,
+    warehouse_repo: WarehouseRepoDep,
+    event_dispatcher: EventDispatcherDep,
 ) -> CreateMovementUseCase:
     return CreateMovementUseCase(
-        repository=repo, item_repository=item_repo, warehouse_repository=warehouse_repo
+        repository=repo,
+        item_repository=item_repo,
+        warehouse_repository=warehouse_repo,
+        event_dispatcher=event_dispatcher,
     )
 
 

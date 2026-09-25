@@ -18,13 +18,14 @@ class MovementMapper:
             occurred_at = occurred_at.replace(tzinfo=UTC)
 
         entity = Movement(
+            id=model.id,
             item_id=model.item_id,
             warehouse_id=model.warehouse_id,
             quantity=Quantity(value=model.quantity),
             movement_type=MovementType(model.movement_type),
             occurred_at=occurred_at,
         )
-        entity.id = model.id
+        entity.clear_domain_events()
         return entity
 
     @staticmethod

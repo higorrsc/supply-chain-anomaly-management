@@ -3,8 +3,10 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+from src.core.domain.events import EventDispatcher
 from src.inventory.domain.entities import Movement
 from src.inventory.domain.enums import MovementType
+from src.inventory.domain.events import MovementCreatedEvent
 from src.inventory.domain.exceptions import ItemNotFoundError, WarehouseNotFoundError
 from src.inventory.domain.repositories import (
     IItemRepository,
@@ -33,12 +35,14 @@ class CreateMovementUseCase:
         repository: IMovementRepository,
         item_repository: IItemRepository,
         warehouse_repository: IWarehouseRepository,
+        event_dispatcher: EventDispatcher | None = None,
     ) -> None:
         """Initialize the use case."""
 
         self._repository = repository
         self._item_repository = item_repository
         self._warehouse_repository = warehouse_repository
+        self._event_dispatcher = event_dispatcher
 
     async def execute(self, request: CreateMovementRequestDTO) -> Movement:
         """Execute the use case."""
@@ -63,4 +67,11 @@ class CreateMovementUseCase:
             occurred_at=request.occurred_at,
         )
 
-        return await self._repository.save(movement)
+        saved_movement = await self._repository.save(movement)
+        
+        if self._event_dispatcher:
+            for event in movement.list_domain_events():
+                await self._event_dispatcher.publish(event)
+            movement.clear_domain_events()
+            
+        return saved_movement
