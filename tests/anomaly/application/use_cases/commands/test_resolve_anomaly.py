@@ -39,16 +39,16 @@ class TestResolveAnomalyUseCase:
         )
         repository.get_by_id.return_value = existing_anomaly
 
-        async def mock_save(anomaly: Anomaly) -> Anomaly:
+        async def mock_update(anomaly: Anomaly) -> Anomaly:
             return anomaly
 
-        repository.save.side_effect = mock_save
+        repository.update.side_effect = mock_update
 
         request = ResolveAnomalyRequestDTO(anomaly_id=anomaly_id)
         saved_anomaly = await use_case.execute(request)
 
         repository.get_by_id.assert_awaited_once_with(anomaly_id)
-        repository.save.assert_awaited_once_with(existing_anomaly)
+        repository.update.assert_awaited_once_with(existing_anomaly)
 
         assert saved_anomaly.status == AnomalyStatus.RESOLVED
 
