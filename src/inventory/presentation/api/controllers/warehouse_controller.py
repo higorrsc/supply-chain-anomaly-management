@@ -71,6 +71,10 @@ async def create_warehouse(
 @router.get("", response_model=SearchWarehousesResponse)
 async def search_warehouses(
     use_case: Annotated[SearchWarehouseUseCase, Depends(get_search_warehouse_use_case)],
+    name: Annotated[str | None, Query(description="Filter by name")] = None,
+    location_code: Annotated[
+        str | None, Query(description="Filter by location code")
+    ] = None,
     is_active: Annotated[
         bool | None, Query(description="Filter by active status")
     ] = None,
@@ -79,6 +83,10 @@ async def search_warehouses(
 ) -> Any:
     """Search warehouses with pagination and filters."""
     filters: dict[str, Any] = {}
+    if name is not None:
+        filters["name"] = name
+    if location_code is not None:
+        filters["location_code"] = location_code
     if is_active is not None:
         filters["is_active"] = is_active
 

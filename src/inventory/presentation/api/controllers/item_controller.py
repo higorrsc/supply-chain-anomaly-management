@@ -73,6 +73,9 @@ async def create_item(
 async def search_items(
     use_case: Annotated[SearchItemUseCase, Depends(get_search_item_use_case)],
     sku: Annotated[str | None, Query(description="Filter by SKU")] = None,
+    description: Annotated[
+        str | None, Query(description="Filter by description")
+    ] = None,
     is_active: Annotated[
         bool | None, Query(description="Filter by active status")
     ] = None,
@@ -83,6 +86,8 @@ async def search_items(
     filters: dict[str, Any] = {}
     if sku is not None:
         filters["sku"] = sku
+    if description is not None:
+        filters["description"] = description
     if is_active is not None:
         filters["is_active"] = is_active
 

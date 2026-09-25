@@ -85,11 +85,16 @@ class SqlAlchemyRepository[T: AbstractEntity, M: Base](AbstractRepository[T]):
 
         stmt = select(self.model_class)
 
-        # Apply basic exact-match filters if they map directly to column names
+        from sqlalchemy import String
+
+        # Apply exact-match or partial filters if they map directly to column names
         for key, value in criteria.filters.items():
             if hasattr(self.model_class, key):
                 column = getattr(self.model_class, key)
-                stmt = stmt.where(column == value)
+                if isinstance(value, str) and isinstance(column.type, String):
+                    stmt = stmt.where(column.ilike(f"%{value}%"))
+                else:
+                    stmt = stmt.where(column == value)
 
         # Calculate offset
         page = criteria.pagination.page
