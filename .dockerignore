@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Environments
+.venv/
+.env
+.env.*
+
+# Python Cache
+__pycache__/
+*.py[codz]
+*.so
+
+# Tests and Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Linters and type checkers
+.mypy_cache/
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+compose.yaml
+
+# Project specific docs and agents
+.agents/
+openspec/
+AGENTS.md
+skills-lock.json
+
+# Other directories not needed in the image
+nginx/
+tests/
+docs/
