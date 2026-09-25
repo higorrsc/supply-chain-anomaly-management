@@ -51,12 +51,19 @@ async def create_movement(
         movement = await use_case.execute(dto)
         return MovementResponse.model_validate(movement)
     except (ItemNotFoundError, WarehouseNotFoundError) as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except ConflictError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        ) from e
     except InvalidMovementError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -65,10 +72,12 @@ async def search_movements(
     use_case: Annotated[SearchMovementUseCase, Depends(get_search_movement_use_case)],
     item_id: Annotated[UUID | None, Query(description="Filter by item ID")] = None,
     warehouse_id: Annotated[
-        UUID | None, Query(description="Filter by warehouse ID")
+        UUID | None,
+        Query(description="Filter by warehouse ID"),
     ] = None,
     movement_type: Annotated[
-        MovementType | None, Query(description="Filter by type")
+        MovementType | None,
+        Query(description="Filter by type"),
     ] = None,
     page: Annotated[int, Query(ge=1, description="Page number")] = 1,
     page_size: Annotated[int, Query(ge=1, le=100, description="Items per page")] = 10,
@@ -99,4 +108,7 @@ async def get_movement_by_id(
         movement = await use_case.execute(dto)
         return MovementResponse.model_validate(movement)
     except MovementNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e

@@ -61,10 +61,14 @@ async def create_warehouse(
         warehouse = await use_case.execute(dto)
         return WarehouseResponse.model_validate(warehouse)
     except ConflictError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        ) from e
     except InvalidWarehouseError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -73,10 +77,12 @@ async def search_warehouses(
     use_case: Annotated[SearchWarehouseUseCase, Depends(get_search_warehouse_use_case)],
     name: Annotated[str | None, Query(description="Filter by name")] = None,
     location_code: Annotated[
-        str | None, Query(description="Filter by location code")
+        str | None,
+        Query(description="Filter by location code"),
     ] = None,
     is_active: Annotated[
-        bool | None, Query(description="Filter by active status")
+        bool | None,
+        Query(description="Filter by active status"),
     ] = None,
     page: Annotated[int, Query(ge=1, description="Page number")] = 1,
     page_size: Annotated[int, Query(ge=1, le=100, description="Items per page")] = 10,
@@ -107,7 +113,10 @@ async def get_warehouse_by_id(
         warehouse = await use_case.execute(dto)
         return WarehouseResponse.model_validate(warehouse)
     except WarehouseNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
 
 
 @router.put("/{warehouse_id}", response_model=WarehouseResponse)
@@ -126,10 +135,14 @@ async def update_warehouse(
         warehouse = await use_case.execute(dto)
         return WarehouseResponse.model_validate(warehouse)
     except WarehouseNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidWarehouseError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -143,7 +156,10 @@ async def delete_warehouse(
         dto = DeleteRequestDTO(id=warehouse_id)
         await use_case.execute(dto)
     except WarehouseNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
 
 
 @router.put("/{warehouse_id}/activate", status_code=status.HTTP_204_NO_CONTENT)
@@ -158,10 +174,14 @@ async def activate_warehouse(
         dto = ActivateRequestDTO(id=warehouse_id)
         await use_case.execute(dto)
     except WarehouseNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidWarehouseError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -177,8 +197,12 @@ async def deactivate_warehouse(
         dto = DeactivateRequestDTO(id=warehouse_id)
         await use_case.execute(dto)
     except WarehouseNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidWarehouseError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e

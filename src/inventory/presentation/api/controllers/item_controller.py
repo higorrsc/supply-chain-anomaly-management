@@ -62,10 +62,14 @@ async def create_item(
         item = await use_case.execute(dto)
         return ItemResponse.model_validate(item)
     except ConflictError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        ) from e
     except InvalidItemError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -74,10 +78,12 @@ async def search_items(
     use_case: Annotated[SearchItemUseCase, Depends(get_search_item_use_case)],
     sku: Annotated[str | None, Query(description="Filter by SKU")] = None,
     description: Annotated[
-        str | None, Query(description="Filter by description")
+        str | None,
+        Query(description="Filter by description"),
     ] = None,
     is_active: Annotated[
-        bool | None, Query(description="Filter by active status")
+        bool | None,
+        Query(description="Filter by active status"),
     ] = None,
     page: Annotated[int, Query(ge=1, description="Page number")] = 1,
     page_size: Annotated[int, Query(ge=1, le=100, description="Items per page")] = 10,
@@ -114,7 +120,8 @@ async def get_item_by_sku(
         return ItemResponse.model_validate(item)
     except InvalidItemError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -129,7 +136,10 @@ async def get_item_by_id(
         item = await use_case.execute(dto)
         return ItemResponse.model_validate(item)
     except ItemNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
 
 
 @router.put("/{item_id}", response_model=ItemResponse)
@@ -147,10 +157,14 @@ async def update_item(
         item = await use_case.execute(dto)
         return ItemResponse.model_validate(item)
     except ItemNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidItemError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -164,7 +178,10 @@ async def delete_item(
         dto = DeleteRequestDTO(id=item_id)
         await use_case.execute(dto)
     except ItemNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
 
 
 @router.put("/{item_id}/activate", status_code=status.HTTP_204_NO_CONTENT)
@@ -177,10 +194,14 @@ async def activate_item(
         dto = ActivateRequestDTO(id=item_id)
         await use_case.execute(dto)
     except ItemNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidItemError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e
 
 
@@ -194,8 +215,12 @@ async def deactivate_item(
         dto = DeactivateRequestDTO(id=item_id)
         await use_case.execute(dto)
     except ItemNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
     except InvalidItemError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e),
         ) from e

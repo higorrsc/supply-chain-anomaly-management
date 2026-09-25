@@ -102,12 +102,12 @@ async def entity_validation_error_handler(
     error_response = RFC7807Error(
         type="urn:api:error:validation",
         title="Unprocessable Entity",
-        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status=status.HTTP_422_UNPROCESSABLE_CONTENT,
         detail=str(exc),
         instance=str(request.url.path),
     )
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content=error_response.model_dump(),
         media_type="application/problem+json",
     )
@@ -164,12 +164,12 @@ async def request_validation_exception_handler(
     error_response = RFC7807Error(
         type="urn:api:error:validation",
         title="Unprocessable Entity",
-        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status=status.HTTP_422_UNPROCESSABLE_CONTENT,
         detail=str(exc.errors()),
         instance=str(request.url.path),
     )
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content=error_response.model_dump(),
         media_type="application/problem+json",
     )
