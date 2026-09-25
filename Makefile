@@ -4,7 +4,7 @@
 
 UV := uv
 
-APP := # src.main:app
+APP := src.main:app
 HOST := 0.0.0.0
 PORT := 8000
 
