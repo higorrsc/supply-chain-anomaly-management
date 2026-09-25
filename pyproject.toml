@@ -1,17 +1,32 @@
 [project]
 name = "supply-chain-anomaly-management"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "A comprehensive web application designed to manage and monitor supply chain stock movements, detecting anomalies in real-time based on statistical patterns."
 readme = "README.md"
 authors = [
   { name = "Higor Rodrigues dos Santos Cruz", email = "higorrsc@gmail.com" },
 ]
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.14,<3.15"
+dependencies = [
+  "aiosqlite>=0.22.1",
+  "alembic>=1.20.0",
+  "asgi-lifespan>=2.1.0",
+  "asyncpg>=0.31.0",
+  "fastapi[standard]>=0.141.1",
+  "pydantic>=2.13.5",
+  "pydantic-settings>=2.15.0",
+  "pyyaml>=6.0.3",
+  "sqlalchemy>=2.0.54",
+  "streamlit>=1.64.0",
+  "uvicorn[standard]>=0.53.0",
+]
 
 [dependency-groups]
 dev = [
+  "factory-boy>=3.3.3",
+  "faker>=40.39.0",
   "httpx>=0.28.1",
+  "httpx2>=2.13.1",
   "ipykernel>=7.2.0",
   "ipython>=9.5.0",
   "mypy>=1.18.2",
@@ -28,13 +43,22 @@ dev = [
 
 [tool.mypy]
 python_version = "3.14"
+# Type checking
 check_untyped_defs = true
-disallow_untyped_defs = false
+disallow_any_generics = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_return_any = true
+# Imports / packages
 explicit_package_bases = true
 ignore_missing_imports = true
 namespace_packages = true
+# Warnings
 warn_unused_configs = true
-exclude = ["alembic/versions"]
+# Exclusions
+exclude = ["migrations/versions"]
+
 
 # ------------------------------------------------------
 # Ruff
@@ -58,11 +82,14 @@ line-ending = "auto"
 # B: bugbear
 # UP: pyupgrade
 # N: naming
-select = ["E", "F", "I", "W", "B", "UP", "N"]
+# SIM: simplify
+# ASYNC: async-specific checks
+# RUF: Ruff-specific rules
+select = ["E", "F", "I", "W", "B", "UP", "N", "SIM", "ASYNC", "RUF"]
 ignore = []
 
 [tool.ruff.lint.pycodestyle]
-max-line-length = 100
+max-line-length = 88
 
 # ------------------------------------------------------
 # Pytest
@@ -70,9 +97,33 @@ max-line-length = 100
 
 [tool.pytest.ini_options]
 pythonpath = "."
-python_files = "tests.py tests_*.py *_tests.py test_*.py *_test.py"
+python_files = [
+  "tests.py",
+  "tests_*.py",
+  "*_tests.py",
+  "test_*.py",
+  "*_test.py",
+]
 addopts = "-v --import-mode=importlib"
-testpaths = "tests"
+testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 filterwarnings = []
+
+# ------------------------------------------------------
+# Coverage
+# ------------------------------------------------------
+
+[tool.coverage.run]
+omit = ["*/__init__.py", "tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if self.debug:",
+  "raise NotImplementedError",
+  "if TYPE_CHECKING:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+]

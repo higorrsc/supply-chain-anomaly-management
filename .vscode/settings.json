@@ -1,13 +1,23 @@
 {
   "cSpell.language": "en,pt-BR",
   "cSpell.words": [
+    "Activatable",
+    "asynccontextmanager",
+    "dataclasses",
+    "fastapi",
     "healthcheck",
     "isready",
+    "mensageria",
+    "mockadas",
     "mypy",
+    "nullable",
+    "openspec",
     "postgres",
     "postgresql",
     "pycache",
+    "pydantic",
     "pytest",
+    "sqlalchemy",
     "uvicorn",
     "Uvicorn"
   ],
@@ -23,14 +33,9 @@
   "editor.formatOnType": true,
   "editor.renderWhitespace": "boundary",
   "editor.rulers": [
-    88,
-    100
+    88
   ],
   "editor.tabSize": 4,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.ruff": "explicit",
-    "source.organizeImports.ruff": "explicit"
-  },
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   // ----------------------------
@@ -40,9 +45,9 @@
   "python.analysis.autoSearchPaths": false,
   "python.analysis.importFormat": "absolute",
   "python.analysis.inlayHints.callArgumentNames": "all",
-  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.typeCheckingMode": "off",
   "python.defaultInterpreterPath": ".venv/bin/python",
-  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvironment": false,
   "python.testing.pytestArgs": [
     "--import-mode=importlib",
     "-v",
@@ -111,7 +116,7 @@
   // DOCKERFILE
   // ----------------------------
   "[dockerfile]": {
-    "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+    "editor.defaultFormatter": "ms-azuretools.vscode-containers",
     "editor.tabSize": 2
   },
   // ----------------------------

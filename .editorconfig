@@ -63,8 +63,6 @@ indent_size = 2
 
 # =========================
 # Makefile
-# IMPORTANTE:
-# Make exige TAB
 # =========================
 
 [{Makefile,Makefile.*,*.mk}]
@@ -75,6 +73,14 @@ indent_style = tab
 # =========================
 
 [Dockerfile*]
+indent_style = space
+indent_size = 2
+
+# =========================
+# Shell
+# =========================
+
+[*.{sh,bash}]
 indent_style = space
 indent_size = 2
 

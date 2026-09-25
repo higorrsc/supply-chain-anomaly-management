@@ -219,3 +219,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Sqlite
+*.db
+
+# Streamlit agent skills (environment-specific symlinks)
+.agents/skills/developing-with-streamlit
