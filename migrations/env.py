@@ -7,6 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Import all models here so they are registered with Base.metadata before autogenerate
+import src.anomaly.infrastructure.models
 import src.inventory.infrastructure.models  # noqa
 from src.core.infrastructure.config.settings import Settings
 from src.core.infrastructure.database.base import Base
