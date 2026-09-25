@@ -1,0 +1,5 @@
+enabled: true
+deviation_thresholds:
+  low: 1.5
+  high: 2.5
+  critical: 3.5
