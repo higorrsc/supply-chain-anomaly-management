@@ -1,12 +1,19 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI, status
+from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from src.anomaly.presentation.api.controllers.anomaly_controller import (
     router as anomaly_router,
+)
+from src.core.domain.exceptions import (
+    ConflictError,
+    DomainError,
+    EntityNotFoundError,
+    EntityValidationError,
 )
 from src.core.infrastructure.database.session import engine
 from src.inventory.presentation.api.controllers import (
@@ -45,6 +52,52 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Exception Handlers
+@app.exception_handler(EntityNotFoundError)
+async def entity_not_found_handler(
+    request: Request,
+    exc: EntityNotFoundError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=404,
+        content={"detail": str(exc)},
+    )
+
+
+@app.exception_handler(ConflictError)
+async def conflict_error_handler(
+    request: Request,
+    exc: ConflictError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=409,
+        content={"detail": str(exc)},
+    )
+
+
+@app.exception_handler(EntityValidationError)
+async def entity_validation_error_handler(
+    request: Request,
+    exc: EntityValidationError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"detail": str(exc)},
+    )
+
+
+@app.exception_handler(DomainError)
+async def domain_error_handler(
+    request: Request,
+    exc: DomainError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=400,
+        content={"detail": str(exc)},
+    )
+
 
 # Create API Versioning Router
 api_v1_router = APIRouter(prefix="/api/v1")
