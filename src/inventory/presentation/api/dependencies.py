@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.domain.events import EventDispatcher
 from src.core.infrastructure.database.session import get_db_session
 from src.core.presentation.api.dependencies import get_event_dispatcher
-from src.core.domain.events import EventDispatcher
 from src.inventory.application.use_cases.commands import (
     ActivateItemUseCase,
     ActivateWarehouseUseCase,

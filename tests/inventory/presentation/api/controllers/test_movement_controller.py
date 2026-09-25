@@ -6,22 +6,15 @@ from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
-from src.main import (
-    entity_not_found_handler,
-    conflict_error_handler,
-    entity_validation_error_handler,
-    domain_error_handler,
-)
-from src.core.domain.exceptions import (
-    EntityNotFoundError,
-    ConflictError,
-    EntityValidationError,
-    DomainError,
-)
-
 from httpx import ASGITransport, AsyncClient
 
-from src.core.application.use_cases.queries.generic_search import SearchResponseDTO
+from src.core.application.use_cases.queries import SearchResponseDTO
+from src.core.domain.exceptions import (
+    ConflictError,
+    DomainError,
+    EntityNotFoundError,
+    EntityValidationError,
+)
 from src.inventory.application.use_cases.commands import CreateMovementUseCase
 from src.inventory.application.use_cases.queries import (
     GetMovementByIdUseCase,
@@ -31,20 +24,26 @@ from src.inventory.domain.entities import Movement
 from src.inventory.domain.enums import MovementType
 from src.inventory.domain.exceptions import MovementNotFoundError
 from src.inventory.domain.value_objects import Quantity
-from src.inventory.presentation.api.controllers.movement_controller import router
+from src.inventory.presentation.api.controllers import movement_router
 from src.inventory.presentation.api.dependencies import (
     get_create_movement_use_case,
     get_movement_by_id_use_case,
     get_search_movement_use_case,
 )
+from src.main import (
+    conflict_error_handler,
+    domain_error_handler,
+    entity_not_found_handler,
+    entity_validation_error_handler,
+)
 
 app = FastAPI()
-app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)
-app.add_exception_handler(ConflictError, conflict_error_handler)
-app.add_exception_handler(EntityValidationError, entity_validation_error_handler)
-app.add_exception_handler(DomainError, domain_error_handler)
+app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)  # type: ignore[arg-type]
+app.add_exception_handler(ConflictError, conflict_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(EntityValidationError, entity_validation_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(DomainError, domain_error_handler)  # type: ignore[arg-type]
 
-app.include_router(router)
+app.include_router(movement_router)
 
 mock_create_uc = AsyncMock(spec=CreateMovementUseCase)
 mock_get_by_id_uc = AsyncMock(spec=GetMovementByIdUseCase)

@@ -6,7 +6,6 @@ from uuid import UUID
 from src.core.domain.events import EventDispatcher
 from src.inventory.domain.entities import Movement
 from src.inventory.domain.enums import MovementType
-from src.inventory.domain.events import MovementCreatedEvent
 from src.inventory.domain.exceptions import ItemNotFoundError, WarehouseNotFoundError
 from src.inventory.domain.repositories import (
     IItemRepository,
@@ -68,10 +67,10 @@ class CreateMovementUseCase:
         )
 
         saved_movement = await self._repository.save(movement)
-        
+
         if self._event_dispatcher:
             for event in movement.list_domain_events():
                 await self._event_dispatcher.publish(event)
             movement.clear_domain_events()
-            
+
         return saved_movement

@@ -3,9 +3,9 @@ from .movement_repository import FakeMovementRepository
 from .warehouse_repository import FakeWarehouseRepository
 
 __all__ = [
+    "FakeAnomalyRepository",
     "FakeItemRepository",
     "FakeMovementRepository",
     "FakeWarehouseRepository",
-    "FakeAnomalyRepository",
 ]
 from .anomaly_repository import FakeAnomalyRepository

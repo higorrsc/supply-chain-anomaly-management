@@ -6,10 +6,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.anomaly.presentation.api.controllers.anomaly_controller import (
-    router as anomaly_router,
-)
+from src.anomaly.presentation.api.controllers import anomaly_router
 from src.core.domain.exceptions import (
     ConflictError,
     DomainError,
@@ -27,17 +26,19 @@ from src.inventory.presentation.api.controllers import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    from src.core.presentation.api.dependencies import get_event_dispatcher
-    from src.anomaly.presentation.api.dependencies import get_anomaly_repository
-    from src.anomaly.infrastructure.config.loader import load_anomaly_rules
+    import asyncio
+    import logging
+
+    from sqlalchemy.exc import IntegrityError
+
     from src.anomaly.application.use_cases.event_handlers import (
         DetectAnomalyForMovementHandler,
     )
-    from src.inventory.domain.events import MovementCreatedEvent
+    from src.anomaly.infrastructure.config.loader import load_anomaly_rules
+    from src.anomaly.presentation.api.dependencies import get_anomaly_repository
     from src.core.infrastructure.database.session import AsyncSessionLocal
-    import logging
-    import asyncio
-    from sqlalchemy.exc import IntegrityError
+    from src.core.presentation.api.dependencies import get_event_dispatcher
+    from src.inventory.domain.events import MovementCreatedEvent
 
     logger = logging.getLogger(__name__)
 
@@ -45,9 +46,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         rules = load_anomaly_rules()
         dispatcher = get_event_dispatcher()
 
+        from src.core.domain.events import DomainEvent, EventHandler
+
         class ScopedDetectAnomalyForMovementHandler:
-            async def __call__(self, event: MovementCreatedEvent) -> None:
-                async def run_handler():
+            async def __call__(self, event: DomainEvent) -> None:
+                assert isinstance(event, MovementCreatedEvent)
+
+                async def run_handler() -> None:
                     for _ in range(5):
                         await asyncio.sleep(0.1)
                         try:
@@ -66,19 +71,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                             logger.error(f"Error in handler: {e}")
                             break
 
-                asyncio.create_task(run_handler())
+                _task = asyncio.create_task(run_handler())
+                del _task
 
-        dispatcher.subscribe(
-            MovementCreatedEvent, ScopedDetectAnomalyForMovementHandler()
-        )
+        scoped_handler: EventHandler = ScopedDetectAnomalyForMovementHandler()
+        dispatcher.subscribe(MovementCreatedEvent, scoped_handler)
         logger.info(
-            "Successfully subscribed DetectAnomalyForMovementHandler to MovementCreatedEvent."
+            "Successfully subscribed DetectAnomalyForMovementHandler "
+            "to MovementCreatedEvent."
         )
     except Exception as e:
         logger.warning(f"Could not load anomaly rules on startup: {e}")
 
     yield
-    from src.core.infrastructure.database.session import engine
 
     await engine.dispose()
 
@@ -175,9 +180,6 @@ async def domain_error_handler(
         content=error_response.model_dump(),
         media_type="application/problem+json",
     )
-
-
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 @app.exception_handler(StarletteHTTPException)

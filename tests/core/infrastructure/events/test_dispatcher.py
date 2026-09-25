@@ -1,4 +1,5 @@
 import asyncio
+
 import pytest
 
 from src.core.domain.events import DomainEvent
@@ -14,7 +15,7 @@ class OtherEvent(DomainEvent):
 
 
 @pytest.mark.asyncio
-async def test_async_event_dispatcher_pub_sub():
+async def test_async_event_dispatcher_pub_sub() -> None:
     dispatcher = AsyncEventDispatcher()
 
     received_events = []

@@ -4,23 +4,15 @@ from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
-from src.main import (
-    entity_not_found_handler,
-    conflict_error_handler,
-    entity_validation_error_handler,
-    domain_error_handler,
-)
-from src.core.domain.exceptions import (
-    EntityNotFoundError,
-    ConflictError,
-    EntityValidationError,
-    DomainError,
-)
-
 from httpx import ASGITransport, AsyncClient
 
-from src.core.application.use_cases.queries.generic_search import SearchResponseDTO
-from src.core.domain import ConflictError
+from src.core.application.use_cases.queries import SearchResponseDTO
+from src.core.domain.exceptions import (
+    ConflictError,
+    DomainError,
+    EntityNotFoundError,
+    EntityValidationError,
+)
 from src.inventory.application.use_cases.commands import (
     ActivateItemUseCase,
     CreateItemUseCase,
@@ -36,7 +28,7 @@ from src.inventory.application.use_cases.queries import (
 from src.inventory.domain.entities import Item
 from src.inventory.domain.exceptions import ItemNotFoundError
 from src.inventory.domain.value_objects import SKU
-from src.inventory.presentation.api.controllers.item_controller import router
+from src.inventory.presentation.api.controllers import item_router
 from src.inventory.presentation.api.dependencies import (
     get_activate_item_use_case,
     get_create_item_use_case,
@@ -47,14 +39,20 @@ from src.inventory.presentation.api.dependencies import (
     get_search_item_use_case,
     get_update_item_use_case,
 )
+from src.main import (
+    conflict_error_handler,
+    domain_error_handler,
+    entity_not_found_handler,
+    entity_validation_error_handler,
+)
 
 app = FastAPI()
-app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)
-app.add_exception_handler(ConflictError, conflict_error_handler)
-app.add_exception_handler(EntityValidationError, entity_validation_error_handler)
-app.add_exception_handler(DomainError, domain_error_handler)
+app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)  # type: ignore[arg-type]
+app.add_exception_handler(ConflictError, conflict_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(EntityValidationError, entity_validation_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(DomainError, domain_error_handler)  # type: ignore[arg-type]
 
-app.include_router(router)
+app.include_router(item_router)
 
 mock_create_uc = AsyncMock(spec=CreateItemUseCase)
 mock_get_by_id_uc = AsyncMock(spec=GetItemByIdUseCase)

@@ -29,7 +29,8 @@ class DetectAnomalyForMovementHandler:
                 )
                 await self.repository.save(anomaly)
                 logger.info(
-                    f"Anomaly detected for item {event.item_id} with severity {severity}"
+                    f"Anomaly detected for item {event.item_id} "
+                    f"with severity {severity}"
                 )
         except Exception as e:
             logger.error(

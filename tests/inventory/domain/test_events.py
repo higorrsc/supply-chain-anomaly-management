@@ -5,7 +5,7 @@ from src.inventory.domain.enums import MovementType
 from src.inventory.domain.events import MovementCreatedEvent
 
 
-def test_movement_created_event():
+def test_movement_created_event() -> None:
     movement_id = uuid4()
     item_id = uuid4()
     warehouse_id = uuid4()

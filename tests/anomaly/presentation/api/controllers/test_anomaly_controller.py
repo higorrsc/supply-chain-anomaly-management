@@ -6,43 +6,22 @@ from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
-from src.main import (
-    entity_not_found_handler,
-    conflict_error_handler,
-    entity_validation_error_handler,
-    domain_error_handler,
-)
-from src.core.domain.exceptions import (
-    EntityNotFoundError,
-    ConflictError,
-    EntityValidationError,
-    DomainError,
-)
-
 from httpx import ASGITransport, AsyncClient
 
 from src.anomaly.application.exceptions import AnomalyNotFoundError
-from src.anomaly.application.use_cases.commands.register_anomaly import (
+from src.anomaly.application.use_cases.commands import (
     RegisterAnomalyUseCase,
-)
-from src.anomaly.application.use_cases.commands.resolve_anomaly import (
     ResolveAnomalyUseCase,
 )
-from src.anomaly.application.use_cases.queries.get_alerts_by_anomaly_id import (
+from src.anomaly.application.use_cases.queries import (
     GetAlertsByAnomalyIdUseCase,
-)
-from src.anomaly.application.use_cases.queries.get_anomaly_by_id import (
     GetAnomalyByIdUseCase,
-)
-from src.anomaly.application.use_cases.queries.search_anomaly import (
     SearchAnomalyUseCase,
 )
-from src.anomaly.domain.entities.anomaly import Anomaly
-from src.anomaly.domain.entities.anomaly_alert import AnomalyAlert
-from src.anomaly.domain.enums.anomaly_severity import AnomalySeverity
-from src.anomaly.domain.enums.anomaly_status import AnomalyStatus
-from src.anomaly.domain.value_objects.score import Score
-from src.anomaly.presentation.api.controllers.anomaly_controller import router
+from src.anomaly.domain.entities import Anomaly, AnomalyAlert
+from src.anomaly.domain.enums import AnomalySeverity, AnomalyStatus
+from src.anomaly.domain.value_objects import Score
+from src.anomaly.presentation.api.controllers import anomaly_router
 from src.anomaly.presentation.api.dependencies import (
     get_alerts_by_anomaly_id_use_case,
     get_anomaly_by_id_use_case,
@@ -51,15 +30,27 @@ from src.anomaly.presentation.api.dependencies import (
     get_search_anomaly_use_case,
 )
 from src.core.application.use_cases.queries.generic_search import SearchResponseDTO
+from src.core.domain.exceptions import (
+    ConflictError,
+    DomainError,
+    EntityNotFoundError,
+    EntityValidationError,
+)
+from src.main import (
+    conflict_error_handler,
+    domain_error_handler,
+    entity_not_found_handler,
+    entity_validation_error_handler,
+)
 
 # Setup FastAPI app for testing
 app = FastAPI()
-app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)
-app.add_exception_handler(ConflictError, conflict_error_handler)
-app.add_exception_handler(EntityValidationError, entity_validation_error_handler)
-app.add_exception_handler(DomainError, domain_error_handler)
+app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)  # type: ignore[arg-type]
+app.add_exception_handler(ConflictError, conflict_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(EntityValidationError, entity_validation_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(DomainError, domain_error_handler)  # type: ignore[arg-type]
 
-app.include_router(router)
+app.include_router(anomaly_router)
 
 # Mock Use Cases
 mock_register_uc = AsyncMock(spec=RegisterAnomalyUseCase)

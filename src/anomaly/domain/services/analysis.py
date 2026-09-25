@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from src.anomaly.domain.enums.anomaly_severity import AnomalySeverity
 from src.anomaly.domain.rules import AnomalyRules
 from src.anomaly.domain.value_objects.score import Score
@@ -21,13 +23,13 @@ class MovementAnomalyAnalysisService:
         # Here we just mock a simple check.
         # Suppose a quantity > 100 is high, > 500 is critical
 
-        score_value = qty / 100.0  # Just a dummy score calculation
+        score_value = Decimal(str(round(qty / 100.0, 4)))
 
-        if score_value >= self.rules.deviation_thresholds.critical:
+        if score_value >= Decimal(str(self.rules.deviation_thresholds.critical)):
             return AnomalySeverity.CRITICAL, Score(value=score_value)
-        elif score_value >= self.rules.deviation_thresholds.high:
+        elif score_value >= Decimal(str(self.rules.deviation_thresholds.high)):
             return AnomalySeverity.HIGH, Score(value=score_value)
-        elif score_value >= self.rules.deviation_thresholds.low:
+        elif score_value >= Decimal(str(self.rules.deviation_thresholds.low)):
             return AnomalySeverity.LOW, Score(value=score_value)
 
         return None, None

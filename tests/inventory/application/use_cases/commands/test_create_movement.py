@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import pytest
 
+from src.core.domain.events import DomainEvent
 from src.inventory.application.use_cases.commands.create_movement import (
     CreateMovementRequestDTO,
     CreateMovementUseCase,
@@ -130,7 +131,7 @@ class TestCreateMovementUseCase:
 
         received_events = []
 
-        async def handler(event):
+        async def handler(event: DomainEvent) -> None:
             received_events.append(event)
 
         dispatcher.subscribe(MovementCreatedEvent, handler)

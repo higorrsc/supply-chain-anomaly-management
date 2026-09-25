@@ -1,8 +1,8 @@
-from collections import defaultdict
-from collections.abc import Awaitable, Callable
 import asyncio
+from collections import defaultdict
 
 from src.core.domain.events import DomainEvent, EventDispatcher, EventHandler
+
 
 class AsyncEventDispatcher(EventDispatcher):
     def __init__(self) -> None:
@@ -15,4 +15,5 @@ class AsyncEventDispatcher(EventDispatcher):
         event_type = type(event)
         handlers = self._handlers.get(event_type, [])
         for handler in handlers:
-            asyncio.create_task(handler(event))
+            _task: asyncio.Task[None] = asyncio.create_task(handler(event))
+            del _task

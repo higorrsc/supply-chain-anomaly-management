@@ -1,7 +1,7 @@
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 
@@ -13,7 +13,7 @@ class DomainEvent:
     occurred_on: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
-EventHandler = Callable[[DomainEvent], Awaitable[None]]
+EventHandler = Callable[[DomainEvent], Coroutine[Any, Any, None]]
 
 
 class EventDispatcher(Protocol):
