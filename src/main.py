@@ -1,7 +1,8 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, Request, status, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -16,6 +17,7 @@ from src.core.domain.exceptions import (
     EntityValidationError,
 )
 from src.core.infrastructure.database.session import engine
+from src.core.presentation.api.schemas import RFC7807Error
 from src.inventory.presentation.api.controllers import (
     item_router,
     movement_router,
@@ -44,7 +46,6 @@ app = FastAPI(
 )
 
 # Configure CORS Middleware
-# Allowing all origins for development, but should be restricted in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -60,9 +61,17 @@ async def entity_not_found_handler(
     request: Request,
     exc: EntityNotFoundError,
 ) -> JSONResponse:
+    error_response = RFC7807Error(
+        type="urn:api:error:not-found",
+        title="Not Found",
+        status=status.HTTP_404_NOT_FOUND,
+        detail=str(exc),
+        instance=str(request.url.path),
+    )
     return JSONResponse(
-        status_code=404,
-        content={"detail": str(exc)},
+        status_code=status.HTTP_404_NOT_FOUND,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
     )
 
 
@@ -71,9 +80,17 @@ async def conflict_error_handler(
     request: Request,
     exc: ConflictError,
 ) -> JSONResponse:
+    error_response = RFC7807Error(
+        type="urn:api:error:conflict",
+        title="Conflict",
+        status=status.HTTP_409_CONFLICT,
+        detail=str(exc),
+        instance=str(request.url.path),
+    )
     return JSONResponse(
-        status_code=409,
-        content={"detail": str(exc)},
+        status_code=status.HTTP_409_CONFLICT,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
     )
 
 
@@ -82,9 +99,17 @@ async def entity_validation_error_handler(
     request: Request,
     exc: EntityValidationError,
 ) -> JSONResponse:
+    error_response = RFC7807Error(
+        type="urn:api:error:validation",
+        title="Unprocessable Entity",
+        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail=str(exc),
+        instance=str(request.url.path),
+    )
     return JSONResponse(
-        status_code=422,
-        content={"detail": str(exc)},
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
     )
 
 
@@ -93,9 +118,60 @@ async def domain_error_handler(
     request: Request,
     exc: DomainError,
 ) -> JSONResponse:
+    error_response = RFC7807Error(
+        type="urn:api:error:domain-rule-violation",
+        title="Bad Request",
+        status=status.HTTP_400_BAD_REQUEST,
+        detail=str(exc),
+        instance=str(request.url.path),
+    )
     return JSONResponse(
-        status_code=400,
-        content={"detail": str(exc)},
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    type_map = {
+        400: "urn:api:error:bad-request",
+        401: "urn:api:error:unauthorized",
+        403: "urn:api:error:forbidden",
+        404: "urn:api:error:not-found",
+        409: "urn:api:error:conflict",
+        422: "urn:api:error:validation",
+    }
+    error_type = type_map.get(exc.status_code, "about:blank")
+    error_response = RFC7807Error(
+        type=error_type,
+        title="HTTP Error",
+        status=exc.status_code,
+        detail=str(exc.detail),
+        instance=str(request.url.path),
+    )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    error_response = RFC7807Error(
+        type="urn:api:error:validation",
+        title="Unprocessable Entity",
+        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail=str(exc.errors()),
+        instance=str(request.url.path),
+    )
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=error_response.model_dump(),
+        media_type="application/problem+json",
     )
 
 
