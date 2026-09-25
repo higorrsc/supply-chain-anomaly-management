@@ -27,14 +27,59 @@ from src.inventory.presentation.api.controllers import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    """
-    Lifespan context manager for FastAPI application.
-    Handles startup and shutdown events, such as database connection pooling.
-    """
-    # Yield control to the application
-    yield
+    from src.core.presentation.api.dependencies import get_event_dispatcher
+    from src.anomaly.presentation.api.dependencies import get_anomaly_repository
+    from src.anomaly.infrastructure.config.loader import load_anomaly_rules
+    from src.anomaly.application.use_cases.event_handlers import (
+        DetectAnomalyForMovementHandler,
+    )
+    from src.inventory.domain.events import MovementCreatedEvent
+    from src.core.infrastructure.database.session import AsyncSessionLocal
+    import logging
+    import asyncio
+    from sqlalchemy.exc import IntegrityError
 
-    # Clean up database engine on shutdown
+    logger = logging.getLogger(__name__)
+
+    try:
+        rules = load_anomaly_rules()
+        dispatcher = get_event_dispatcher()
+
+        class ScopedDetectAnomalyForMovementHandler:
+            async def __call__(self, event: MovementCreatedEvent) -> None:
+                async def run_handler():
+                    for _ in range(5):
+                        await asyncio.sleep(0.1)
+                        try:
+                            async with AsyncSessionLocal() as session:
+                                repo = get_anomaly_repository(session)
+                                handler = DetectAnomalyForMovementHandler(
+                                    repository=repo, rules=rules
+                                )
+                                await handler.handle(event)
+                                await session.commit()
+                            break
+                        except IntegrityError:
+                            logger.warning("Integrity error in handler, retrying...")
+                            continue
+                        except Exception as e:
+                            logger.error(f"Error in handler: {e}")
+                            break
+
+                asyncio.create_task(run_handler())
+
+        dispatcher.subscribe(
+            MovementCreatedEvent, ScopedDetectAnomalyForMovementHandler()
+        )
+        logger.info(
+            "Successfully subscribed DetectAnomalyForMovementHandler to MovementCreatedEvent."
+        )
+    except Exception as e:
+        logger.warning(f"Could not load anomaly rules on startup: {e}")
+
+    yield
+    from src.core.infrastructure.database.session import engine
+
     await engine.dispose()
 
 
@@ -133,6 +178,8 @@ async def domain_error_handler(
 
 
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+
 @app.exception_handler(StarletteHTTPException)
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
