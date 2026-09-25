@@ -9,7 +9,6 @@ from src.core.application.use_cases.commands import (
     DeleteRequestDTO,
 )
 from src.core.application.use_cases.queries import GetByIdRequestDTO, SearchRequestDTO
-from src.core.domain import ConflictError
 from src.inventory.application.use_cases.commands import (
     ActivateItemUseCase,
     CreateItemRequestDTO,
@@ -25,7 +24,6 @@ from src.inventory.application.use_cases.queries import (
     GetItemBySKUUseCase,
     SearchItemUseCase,
 )
-from src.inventory.domain.exceptions import InvalidItemError, ItemNotFoundError
 from src.inventory.domain.value_objects import SKU
 from src.inventory.presentation.api import (
     get_activate_item_use_case,
@@ -53,24 +51,13 @@ async def create_item(
     use_case: Annotated[CreateItemUseCase, Depends(get_create_item_use_case)],
 ) -> Any:
     """Create a new item."""
-    try:
-        dto = CreateItemRequestDTO(
-            sku=request.sku,
-            description=request.description,
-            is_active=request.is_active,
-        )
-        item = await use_case.execute(dto)
-        return ItemResponse.model_validate(item)
-    except ConflictError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e),
-        ) from e
-    except InvalidItemError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+    dto = CreateItemRequestDTO(
+        sku=request.sku,
+        description=request.description,
+        is_active=request.is_active,
+    )
+    item = await use_case.execute(dto)
+    return ItemResponse.model_validate(item)
 
 
 @router.get("", response_model=SearchItemsResponse)
@@ -109,20 +96,14 @@ async def get_item_by_sku(
     use_case: Annotated[GetItemBySKUUseCase, Depends(get_item_by_sku_use_case)],
 ) -> Any:
     """Get an item by SKU."""
-    try:
-        dto = GetItemBySKURequestDTO(sku=SKU(value=sku))
-        item = await use_case.execute(dto)
-        if not item:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Item with SKU {sku} not found",
-            )
-        return ItemResponse.model_validate(item)
-    except InvalidItemError as e:
+    dto = GetItemBySKURequestDTO(sku=SKU(value=sku))
+    item = await use_case.execute(dto)
+    if not item:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Item with SKU {sku} not found",
+        )
+    return ItemResponse.model_validate(item)
 
 
 @router.get("/{item_id}", response_model=ItemResponse)
@@ -131,15 +112,9 @@ async def get_item_by_id(
     use_case: Annotated[GetItemByIdUseCase, Depends(get_item_by_id_use_case)],
 ) -> Any:
     """Get an item by ID."""
-    try:
-        dto = GetByIdRequestDTO(id=item_id)
-        item = await use_case.execute(dto)
-        return ItemResponse.model_validate(item)
-    except ItemNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
+    dto = GetByIdRequestDTO(id=item_id)
+    item = await use_case.execute(dto)
+    return ItemResponse.model_validate(item)
 
 
 @router.put("/{item_id}", response_model=ItemResponse)
@@ -149,23 +124,12 @@ async def update_item(
     use_case: Annotated[UpdateItemUseCase, Depends(get_update_item_use_case)],
 ) -> Any:
     """Update an existing item."""
-    try:
-        dto = UpdateItemRequestDTO(
-            id=item_id,
-            description=request.description,
-        )
-        item = await use_case.execute(dto)
-        return ItemResponse.model_validate(item)
-    except ItemNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
-    except InvalidItemError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+    dto = UpdateItemRequestDTO(
+        id=item_id,
+        description=request.description,
+    )
+    item = await use_case.execute(dto)
+    return ItemResponse.model_validate(item)
 
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -174,14 +138,8 @@ async def delete_item(
     use_case: Annotated[DeleteItemUseCase, Depends(get_delete_item_use_case)],
 ) -> None:
     """Delete an item."""
-    try:
-        dto = DeleteRequestDTO(id=item_id)
-        await use_case.execute(dto)
-    except ItemNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
+    dto = DeleteRequestDTO(id=item_id)
+    await use_case.execute(dto)
 
 
 @router.put("/{item_id}/activate", status_code=status.HTTP_204_NO_CONTENT)
@@ -190,19 +148,8 @@ async def activate_item(
     use_case: Annotated[ActivateItemUseCase, Depends(get_activate_item_use_case)],
 ) -> None:
     """Activate an item."""
-    try:
-        dto = ActivateRequestDTO(id=item_id)
-        await use_case.execute(dto)
-    except ItemNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
-    except InvalidItemError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+    dto = ActivateRequestDTO(id=item_id)
+    await use_case.execute(dto)
 
 
 @router.put("/{item_id}/deactivate", status_code=status.HTTP_204_NO_CONTENT)
@@ -211,16 +158,5 @@ async def deactivate_item(
     use_case: Annotated[DeactivateItemUseCase, Depends(get_deactivate_item_use_case)],
 ) -> None:
     """Deactivate an item."""
-    try:
-        dto = DeactivateRequestDTO(id=item_id)
-        await use_case.execute(dto)
-    except ItemNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
-    except InvalidItemError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+    dto = DeactivateRequestDTO(id=item_id)
+    await use_case.execute(dto)

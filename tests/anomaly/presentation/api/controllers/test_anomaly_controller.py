@@ -6,6 +6,19 @@ from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
+from src.main import (
+    entity_not_found_handler,
+    conflict_error_handler,
+    entity_validation_error_handler,
+    domain_error_handler,
+)
+from src.core.domain.exceptions import (
+    EntityNotFoundError,
+    ConflictError,
+    EntityValidationError,
+    DomainError,
+)
+
 from httpx import ASGITransport, AsyncClient
 
 from src.anomaly.application.exceptions import AnomalyNotFoundError
@@ -41,6 +54,11 @@ from src.core.application.use_cases.queries.generic_search import SearchResponse
 
 # Setup FastAPI app for testing
 app = FastAPI()
+app.add_exception_handler(EntityNotFoundError, entity_not_found_handler)
+app.add_exception_handler(ConflictError, conflict_error_handler)
+app.add_exception_handler(EntityValidationError, entity_validation_error_handler)
+app.add_exception_handler(DomainError, domain_error_handler)
+
 app.include_router(router)
 
 # Mock Use Cases

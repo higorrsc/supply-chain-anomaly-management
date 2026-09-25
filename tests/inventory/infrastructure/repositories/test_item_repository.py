@@ -69,3 +69,61 @@ class TestItemRepository:
 
         retrieved_item = await repository.get_by_id(saved_item.id)
         assert retrieved_item is None
+
+    async def test_search_item(self, db_session: AsyncSession) -> None:
+        """Test searching items."""
+        from src.core.domain import PageRequest, SearchCriteria
+
+        repository = ItemRepository(session=db_session)
+        item1 = Item(
+            sku=SKU(value="SKU-SEARCH-1"),
+            description="Mouse pad",
+            is_active=True,
+        )
+        item2 = Item(
+            sku=SKU(value="SKU-SEARCH-2"),
+            description="Keyboard",
+            is_active=False,
+        )
+        item3 = Item(
+            sku=SKU(value="SKU-SEARCH-3"),
+            description="Wireless Mouse",
+            is_active=True,
+        )
+
+        await repository.save(item1)
+        await repository.save(item2)
+        await repository.save(item3)
+
+        # Test partial match on description (ILIKE)
+        criteria = SearchCriteria(
+            filters={"description": "mouse"},
+            pagination=PageRequest(page=1, page_size=10),
+        )
+        result = await repository.search(criteria)
+        assert result.total_items >= 2
+        assert any(i.sku.value == "SKU-SEARCH-1" for i in result.items)
+        assert any(i.sku.value == "SKU-SEARCH-3" for i in result.items)
+
+        # Test exact match on is_active
+        criteria = SearchCriteria(
+            filters={"is_active": False}, pagination=PageRequest(page=1, page_size=10)
+        )
+        result = await repository.search(criteria)
+        assert any(i.sku.value == "SKU-SEARCH-2" for i in result.items)
+
+    async def test_update_item_not_found(self, db_session: AsyncSession) -> None:
+        """Test updating an item that does not exist raises EntityNotFoundError."""
+        import pytest
+
+        from src.core.domain import EntityNotFoundError
+
+        repository = ItemRepository(session=db_session)
+        item = Item(
+            sku=SKU(value="SKU-NONE"),
+            description="None",
+            is_active=True,
+        )
+
+        with pytest.raises(EntityNotFoundError):
+            await repository.update(item)

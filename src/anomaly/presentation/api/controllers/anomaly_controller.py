@@ -1,9 +1,8 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 
-from src.anomaly.application.exceptions import AnomalyNotFoundError
 from src.anomaly.application.use_cases.commands.register_anomaly import (
     RegisterAnomalyRequestDTO,
     RegisterAnomalyUseCase,
@@ -75,11 +74,8 @@ async def get_anomaly_by_id(
 ) -> AnomalyResponse:
     """Retrieve a specific anomaly by its ID."""
 
-    try:
-        anomaly = await use_case.execute(GetByIdRequestDTO(id=anomaly_id))
-        return AnomalyResponse.model_validate(anomaly)
-    except AnomalyNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    anomaly = await use_case.execute(GetByIdRequestDTO(id=anomaly_id))
+    return AnomalyResponse.model_validate(anomaly)
 
 
 @router.put(
@@ -93,13 +89,8 @@ async def resolve_anomaly(
 ) -> AnomalyResponse:
     """Mark an anomaly as resolved."""
 
-    try:
-        anomaly = await use_case.execute(
-            ResolveAnomalyRequestDTO(anomaly_id=anomaly_id)
-        )
-        return AnomalyResponse.model_validate(anomaly)
-    except AnomalyNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    anomaly = await use_case.execute(ResolveAnomalyRequestDTO(anomaly_id=anomaly_id))
+    return AnomalyResponse.model_validate(anomaly)
 
 
 @router.get(

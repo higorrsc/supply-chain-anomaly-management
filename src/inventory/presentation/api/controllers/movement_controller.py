@@ -1,10 +1,9 @@
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 
 from src.core.application.use_cases.queries import GetByIdRequestDTO, SearchRequestDTO
-from src.core.domain import ConflictError
 from src.inventory.application.use_cases.commands import (
     CreateMovementRequestDTO,
     CreateMovementUseCase,
@@ -14,12 +13,6 @@ from src.inventory.application.use_cases.queries import (
     SearchMovementUseCase,
 )
 from src.inventory.domain.enums import MovementType
-from src.inventory.domain.exceptions import (
-    InvalidMovementError,
-    ItemNotFoundError,
-    MovementNotFoundError,
-    WarehouseNotFoundError,
-)
 from src.inventory.presentation.api import (
     get_create_movement_use_case,
     get_movement_by_id_use_case,
@@ -40,31 +33,15 @@ async def create_movement(
     use_case: Annotated[CreateMovementUseCase, Depends(get_create_movement_use_case)],
 ) -> Any:
     """Create a new movement."""
-    try:
-        dto = CreateMovementRequestDTO(
-            item_id=request.item_id,
-            warehouse_id=request.warehouse_id,
-            quantity=request.quantity,
-            movement_type=request.movement_type.value,
-            occurred_at=request.occurred_at,
-        )
-        movement = await use_case.execute(dto)
-        return MovementResponse.model_validate(movement)
-    except (ItemNotFoundError, WarehouseNotFoundError) as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
-    except ConflictError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e),
-        ) from e
-    except InvalidMovementError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(e),
-        ) from e
+    dto = CreateMovementRequestDTO(
+        item_id=request.item_id,
+        warehouse_id=request.warehouse_id,
+        quantity=request.quantity,
+        movement_type=request.movement_type.value,
+        occurred_at=request.occurred_at,
+    )
+    movement = await use_case.execute(dto)
+    return MovementResponse.model_validate(movement)
 
 
 @router.get("", response_model=SearchMovementsResponse)
@@ -103,12 +80,6 @@ async def get_movement_by_id(
     use_case: Annotated[GetMovementByIdUseCase, Depends(get_movement_by_id_use_case)],
 ) -> Any:
     """Get a movement by ID."""
-    try:
-        dto = GetByIdRequestDTO(id=movement_id)
-        movement = await use_case.execute(dto)
-        return MovementResponse.model_validate(movement)
-    except MovementNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
-        ) from e
+    dto = GetByIdRequestDTO(id=movement_id)
+    movement = await use_case.execute(dto)
+    return MovementResponse.model_validate(movement)
