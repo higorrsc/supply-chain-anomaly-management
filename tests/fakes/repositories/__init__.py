@@ -6,4 +6,6 @@ __all__ = [
     "FakeItemRepository",
     "FakeMovementRepository",
     "FakeWarehouseRepository",
+    "FakeAnomalyRepository",
 ]
+from .anomaly_repository import FakeAnomalyRepository
