@@ -118,7 +118,8 @@ async def seed_data() -> None:
         await session.commit()
 
     print(
-        f"Seed complete! Generated {len(items)} items, {len(warehouses)} warehouses, and {total_anomalies} anomalies."
+        f"Seed complete! Generated {len(items)} items, "
+        f"{len(warehouses)} warehouses, and {total_anomalies} anomalies."
     )
 
 

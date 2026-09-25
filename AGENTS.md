@@ -370,8 +370,7 @@ Example:
 
 ```python
 class EmployeeRepository(Protocol):
-    async def get_by_id(self, employee_id: UUID) -> Employee | None:
-        ...
+    async def get_by_id(self, employee_id: UUID) -> Employee | None: ...
 ```
 
 The domain/application layer defines the contract.
@@ -889,8 +888,7 @@ HTTP
 Example:
 
 ```python
-def test_should_detect_anomaly_when_deviation_exceeds_threshold():
-    ...
+def test_should_detect_anomaly_when_deviation_exceeds_threshold(): ...
 ```
 
 The domain test should execute quickly.

@@ -29,4 +29,4 @@ class ResolveAnomalyUseCase:
 
         anomaly.resolve()
 
-        return await self._repository.save(anomaly)
+        return await self._repository.update(anomaly)
