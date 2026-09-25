@@ -47,7 +47,7 @@ class TestSearchAnomalyUseCase:
 
         repository.search.assert_awaited_once_with(
             criteria=SearchCriteria(
-                filters={}, pagination=PageRequest(page=1, page_size=1)
+                filters={}, pagination=PageRequest(page=1, page_size=10)
             )
         )
         assert result.meta["total_items"] == 1

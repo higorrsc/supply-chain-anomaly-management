@@ -34,7 +34,7 @@ class GenericSearchUseCase[T]:
 
         criteria = SearchCriteria(
             filters=request.filters,
-            pagination=PageRequest(page=request.page, page_size=request.page),
+            pagination=PageRequest(page=request.page, page_size=request.page_size),
         )
 
         result = await self._repository.search(criteria=criteria)
