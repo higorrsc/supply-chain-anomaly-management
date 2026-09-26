@@ -12,8 +12,31 @@ class AnomalyThresholds(BaseModel):
     critical: float = Field(..., description="Threshold for CRITICAL severity anomaly")
 
 
+class DeviationRule(BaseModel):
+    enabled: bool = True
+    thresholds: AnomalyThresholds
+
+
+class BusinessHoursRule(BaseModel):
+    enabled: bool = True
+    start_time: str = "08:00"
+    end_time: str = "18:00"
+
+
+class MaxQuantityRule(BaseModel):
+    enabled: bool = True
+    max_in: int = 100
+    max_out: int = 50
+
+
+class RulesConfig(BaseModel):
+    deviation: DeviationRule
+    business_hours: BusinessHoursRule
+    max_quantity: MaxQuantityRule
+
+
 class AnomalyRules(BaseModel):
     enabled: bool = Field(
         default=True, description="Whether anomaly detection is enabled"
     )
-    deviation_thresholds: AnomalyThresholds
+    rules: RulesConfig

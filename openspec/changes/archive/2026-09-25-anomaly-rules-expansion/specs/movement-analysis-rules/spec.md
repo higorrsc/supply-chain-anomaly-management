@@ -1,10 +1,6 @@
-# movement-analysis-rules
+# Spec Delta
 
-## Purpose
-
-Provides configurable rules for analyzing stock movements, allowing dynamic thresholds and parameters without code changes.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: YAML Configuration Structure
 
