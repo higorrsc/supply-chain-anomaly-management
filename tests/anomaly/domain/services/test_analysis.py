@@ -5,7 +5,14 @@ from uuid import uuid4
 import pytest
 
 from src.anomaly.domain.enums import AnomalySeverity
-from src.anomaly.domain.rules import AnomalyRules, AnomalyThresholds
+from src.anomaly.domain.rules import (
+    AnomalyRules,
+    AnomalyThresholds,
+    BusinessHoursRule,
+    DeviationRule,
+    MaxQuantityRule,
+    RulesConfig,
+)
 from src.anomaly.domain.services.analysis import MovementAnomalyAnalysisService
 from src.inventory.domain.enums import MovementType
 from src.inventory.domain.events import MovementCreatedEvent
@@ -15,7 +22,13 @@ from src.inventory.domain.events import MovementCreatedEvent
 def rules() -> AnomalyRules:
     return AnomalyRules(
         enabled=True,
-        deviation_thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5),
+        rules=RulesConfig(
+            deviation=DeviationRule(
+                thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5)
+            ),
+            business_hours=BusinessHoursRule(enabled=False),
+            max_quantity=MaxQuantityRule(enabled=False),
+        ),
     )
 
 
@@ -50,7 +63,13 @@ def test_analysis_normal(rules: AnomalyRules) -> None:
 def test_analysis_disabled() -> None:
     rules = AnomalyRules(
         enabled=False,
-        deviation_thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5),
+        rules=RulesConfig(
+            deviation=DeviationRule(
+                thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5)
+            ),
+            business_hours=BusinessHoursRule(enabled=False),
+            max_quantity=MaxQuantityRule(enabled=False),
+        ),
     )
     service = MovementAnomalyAnalysisService(rules)
     event = create_event(1000.0)

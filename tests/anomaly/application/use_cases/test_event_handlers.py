@@ -7,7 +7,14 @@ from src.anomaly.application.use_cases.event_handlers import (
     DetectAnomalyForMovementHandler,
 )
 from src.anomaly.domain.enums import AnomalySeverity
-from src.anomaly.domain.rules import AnomalyRules, AnomalyThresholds
+from src.anomaly.domain.rules import (
+    AnomalyRules,
+    AnomalyThresholds,
+    BusinessHoursRule,
+    DeviationRule,
+    MaxQuantityRule,
+    RulesConfig,
+)
 from src.inventory.domain.enums import MovementType
 from src.inventory.domain.events import MovementCreatedEvent
 from tests.fakes.repositories import FakeAnomalyRepository
@@ -18,7 +25,13 @@ async def test_detect_anomaly_handler() -> None:
     repo = FakeAnomalyRepository()
     rules = AnomalyRules(
         enabled=True,
-        deviation_thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5),
+        rules=RulesConfig(
+            deviation=DeviationRule(
+                thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5)
+            ),
+            business_hours=BusinessHoursRule(enabled=False),
+            max_quantity=MaxQuantityRule(enabled=False),
+        ),
     )
     handler = DetectAnomalyForMovementHandler(repository=repo, rules=rules)
 
@@ -46,7 +59,13 @@ async def test_detect_anomaly_handler_no_anomaly() -> None:
     repo = FakeAnomalyRepository()
     rules = AnomalyRules(
         enabled=True,
-        deviation_thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5),
+        rules=RulesConfig(
+            deviation=DeviationRule(
+                thresholds=AnomalyThresholds(low=1.5, high=2.5, critical=3.5)
+            ),
+            business_hours=BusinessHoursRule(enabled=False),
+            max_quantity=MaxQuantityRule(enabled=False),
+        ),
     )
     handler = DetectAnomalyForMovementHandler(repository=repo, rules=rules)
 
