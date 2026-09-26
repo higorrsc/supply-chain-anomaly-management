@@ -1,5 +1,16 @@
 enabled: true
-deviation_thresholds:
-  low: 1.5
-  high: 2.5
-  critical: 3.5
+rules:
+  deviation:
+    enabled: true
+    thresholds:
+      low: 1.5
+      high: 2.5
+      critical: 3.5
+  business_hours:
+    enabled: true
+    start_time: "08:00"
+    end_time: "18:00"
+  max_quantity:
+    enabled: true
+    max_in: 100
+    max_out: 50
