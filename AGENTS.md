@@ -1040,13 +1040,13 @@ The project uses:
 
 ```text
 Ruff
-MyPy
+Pyrefly
 Pytest
 ```
 
 Ruff is responsible for formatting and linting according to the project configuration.
 
-MyPy must be used for static type checking.
+Pyrefly must be used for static type checking.
 
 Type hints are mandatory for application/domain code.
 
@@ -1098,7 +1098,7 @@ If an exception is genuinely required, document the reason.
 Before committing:
 
 ```bash
-uv run mypy .
+uv run pyrefly check
 ```
 
 The exact target may be defined in project configuration.
@@ -1115,7 +1115,7 @@ Before every commit, run at minimum:
 uv run pytest
 uv run ruff format .
 uv run ruff check .
-uv run mypy .
+uv run pyrefly check
 ```
 
 The repository may define a `Makefile` that centralizes these commands.
@@ -1683,7 +1683,7 @@ Before considering a feature complete:
 [ ] Documentation updated
 [ ] Ruff format executed
 [ ] Ruff lint executed
-[ ] MyPy executed
+[ ] Pyrefly executed
 [ ] Complete test suite executed
 [ ] Git diff reviewed
 [ ] Conventional Commit + Gitmoji prepared
