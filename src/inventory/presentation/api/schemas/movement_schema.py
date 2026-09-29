@@ -19,7 +19,7 @@ class MovementResponse(BaseModel):
     id: UUID = Field(..., description="Unique identifier for the movement")
     item_id: UUID = Field(..., description="ID of the related item")
     warehouse_id: UUID = Field(..., description="ID of the related warehouse")
-    quantity: Decimal = Field(..., gt=0, description="Movement quantity")
+    quantity: Decimal = Field(..., gt=Decimal("0"), description="Movement quantity")
     movement_type: MovementType = Field(..., description="Type of movement")
     occurred_at: datetime = Field(..., description="Date and time of the movement")
 
@@ -31,7 +31,7 @@ class RegisterMovementRequest(BaseModel):
 
     item_id: UUID = Field(..., description="ID of the related item")
     warehouse_id: UUID = Field(..., description="ID of the related warehouse")
-    quantity: Decimal = Field(..., gt=0, description="Movement quantity")
+    quantity: Decimal = Field(..., gt=Decimal("0"), description="Movement quantity")
     movement_type: MovementType = Field(..., description="Type of movement")
     occurred_at: datetime = Field(..., description="Date and time of the movement")
 

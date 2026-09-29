@@ -3,6 +3,7 @@
   "cSpell.words": [
     "Activatable",
     "asynccontextmanager",
+    "autouse",
     "dataclasses",
     "fastapi",
     "healthcheck",
@@ -12,11 +13,14 @@
     "mypy",
     "nullable",
     "openspec",
+    "poolclass",
     "postgres",
     "postgresql",
     "pycache",
     "pydantic",
+    "pyrefly",
     "pytest",
+    "sessionmaker",
     "sqlalchemy",
     "uvicorn",
     "Uvicorn"

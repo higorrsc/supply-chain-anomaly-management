@@ -4,13 +4,13 @@ import uuid
 import pytest
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
 
 from src.core.infrastructure.database import AsyncSessionLocal
 from src.inventory.domain.entities import Item, Warehouse
 from src.inventory.domain.value_objects import SKU
 from src.inventory.infrastructure.repositories import (
     ItemRepository,
+    MovementRepository,
     WarehouseRepository,
 )
 from src.main import app
@@ -54,8 +54,6 @@ async def test_end_to_end_anomaly_detection_flow() -> None:
 
         # Check movement exists in DB
         async with AsyncSessionLocal() as session:
-            result = await session.execute(
-                text("SELECT id FROM movements WHERE id = :id"),
-                {"id": movement_id},
-            )
-            assert result.fetchone() is not None
+            repo = MovementRepository(session)
+            movement = await repo.get_by_id(uuid.UUID(movement_id))
+            assert movement is not None

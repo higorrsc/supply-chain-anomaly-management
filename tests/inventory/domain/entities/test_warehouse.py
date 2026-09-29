@@ -95,7 +95,7 @@ class TestWarehouse:
         assert warehouse.is_active is False
 
         warehouse.activate()
-        assert warehouse.is_active is True
+        assert warehouse.is_active is True  # pyrefly: ignore[unnecessary-comparison]
 
         warehouse.deactivate()
         assert warehouse.is_active is False

@@ -39,7 +39,7 @@ help:
 	@echo "  make lint          Run Ruff linter"
 	@echo "  make format        Format code with Ruff"
 	@echo "  make format-check  Check code formatting"
-	@echo "  make type-check    Run MyPy type checking"
+	@echo "  make type-check    Run Pyrefly type checking"
 	@echo "  make fix           Fix lint and formatting issues"
 	@echo ""
 	@echo "Tests:"
@@ -117,8 +117,8 @@ format-check:
 
 .PHONY: type-check
 type-check:
-	@echo "Running MyPy type checking..."
-	@$(UV) run mypy $(PYTHON_PATHS)
+	@echo "Running Pyrefly type checking..."
+	@$(UV) run pyrefly check
 
 .PHONY: fix
 fix:
@@ -160,7 +160,7 @@ clean:
 		-name "__pycache__" \
 		-o -name ".pytest_cache" \
 		-o -name ".ruff_cache" \
-		-o -name ".mypy_cache" \
+		-o -name ".pyrefly_cache" \
 		-o -name "htmlcov" \
 	\) -prune -exec rm -rf {} +
 

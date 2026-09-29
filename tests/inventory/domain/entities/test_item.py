@@ -67,7 +67,7 @@ class TestItem:
         assert item.is_active is False
 
         item.activate()
-        assert item.is_active is True
+        assert item.is_active is True  # pyrefly: ignore[unnecessary-comparison]
 
         item.deactivate()
         assert item.is_active is False

@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from typing import Any
@@ -67,6 +68,25 @@ def render_page_header(title: str) -> None:
             st.rerun()
 
 
+# --- Helpers ---
+
+
+def get_date(x: pd.Timestamp | datetime.datetime | Any) -> datetime.date | None:
+    """Return the item date."""
+    return x.date() if pd.notnull(x) else None
+
+
+def get_item_description(value: object) -> str:
+    """Return the item description for a value."""
+    value_as_string = str(value)
+    return items_map.get(value_as_string, value_as_string)
+
+
+def serialize_row(row: pd.Series) -> str:
+    """Serialize a DataFrame row as JSON."""
+    return json.dumps(row.to_dict(), default=str)
+
+
 # --- Main Layout ---
 render_page_header("Supply Chain Anomalies")
 
@@ -88,8 +108,8 @@ df["status"] = df["status"].str.upper()
 df["severity"] = df["severity"].str.upper()
 
 # Add Item Description and Raw JSON
-df["item_description"] = df["item_id"].apply(lambda x: items_map.get(str(x), str(x)))
-df["raw_details"] = df.apply(lambda row: json.dumps(row.to_dict(), default=str), axis=1)
+df["item_description"] = df["item_id"].apply(get_item_description)
+df["raw_details"] = df.apply(serialize_row, axis=1)
 
 # --- Sidebar Filters ---
 with st.sidebar:
@@ -127,10 +147,15 @@ filtered_df = df.copy()
 
 if isinstance(date_range, tuple) and len(date_range) == 2:
     start_date, end_date = date_range
+
+    start_datetime = pd.Timestamp(start_date)
+    end_datetime = pd.Timestamp(end_date) + pd.Timedelta(days=1)
+
     filtered_df = filtered_df[
-        (filtered_df["detected_at"].dt.date >= start_date)
-        & (filtered_df["detected_at"].dt.date <= end_date)
+        (filtered_df["detected_at"] >= start_datetime)
+        & (filtered_df["detected_at"] < end_datetime)
     ]
+
 
 if selected_severities:
     filtered_df = filtered_df[filtered_df["severity"].isin(selected_severities)]
@@ -176,7 +201,7 @@ with col2, st.container(border=True):
     st.subheader("Anomalies Over Time")
     if not filtered_df.empty:
         time_df = filtered_df.copy()
-        time_df["date"] = time_df["detected_at"].dt.date
+        time_df["date"] = time_df["detected_at"].apply(get_date)
         daily_counts = time_df.groupby("date").size().reset_index(name="Count")
 
         chart = (

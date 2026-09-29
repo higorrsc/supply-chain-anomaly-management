@@ -25,7 +25,12 @@ class AnomalyResponse(BaseModel):
     id: UUID = Field(..., description="Unique identifier for the anomaly")
     movement_id: UUID = Field(..., description="ID of the related stock movement")
     item_id: UUID = Field(..., description="ID of the related item")
-    score: Decimal = Field(..., ge=0, le=100, description="Anomaly score")
+    score: Decimal = Field(
+        ...,
+        ge=Decimal("0"),
+        le=Decimal("100"),
+        description="Anomaly score",
+    )
     severity: AnomalySeverity = Field(..., description="Severity of the anomaly")
     status: AnomalyStatus = Field(..., description="Current status of the anomaly")
     detected_at: datetime = Field(..., description="Date and time of detection")
@@ -50,6 +55,11 @@ class RegisterAnomalyRequest(BaseModel):
 
     movement_id: UUID = Field(..., description="ID of the related stock movement")
     item_id: UUID = Field(..., description="ID of the related item")
-    score: Decimal = Field(..., ge=0, le=100, description="Anomaly score")
+    score: Decimal = Field(
+        ...,
+        ge=Decimal("0"),
+        le=Decimal("100"),
+        description="Anomaly score",
+    )
     severity: AnomalySeverity = Field(..., description="Severity of the anomaly")
     detected_at: datetime = Field(..., description="Date and time of detection")
