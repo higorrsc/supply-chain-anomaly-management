@@ -6,7 +6,7 @@ from src.inventory.domain.events import MovementCreatedEvent
 
 
 class RuleResult:
-    def __init__(self, severity: AnomalySeverity, score: float):
+    def __init__(self, severity: AnomalySeverity, score: float) -> None:
         self.severity = severity
         self.score = score
 

@@ -41,7 +41,8 @@ class TestGetAlertsByAnomalyIdUseCase:
     async def test_get_alerts_empty(self) -> None:
         """Test getting alerts by anomaly id when none exist."""
         repository = AsyncMock(spec=IAnomalyAlertRepository)
-        repository.get_by_anomaly_id.return_value = []
+        empty_alerts: list[AnomalyAlert] = []
+        repository.get_by_anomaly_id.return_value = empty_alerts
 
         use_case = GetAlertsByAnomalyIdUseCase(repository=repository)
         result = await use_case.execute(uuid.uuid4())
