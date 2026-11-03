@@ -102,7 +102,7 @@ if not raw_anomalies:
 df = pd.DataFrame(raw_anomalies)
 
 # Convert types
-df["detected_at"] = pd.to_datetime(df["detected_at"])
+df["detected_at"] = pd.to_datetime(df["detected_at"], utc=True)
 df["score"] = pd.to_numeric(df["score"])
 df["status"] = df["status"].str.upper()
 df["severity"] = df["severity"].str.upper()
@@ -148,8 +148,8 @@ filtered_df = df.copy()
 if isinstance(date_range, tuple) and len(date_range) == 2:
     start_date, end_date = date_range
 
-    start_datetime = pd.Timestamp(start_date)
-    end_datetime = pd.Timestamp(end_date) + pd.Timedelta(days=1)
+    start_datetime = pd.Timestamp(start_date, tz="UTC")
+    end_datetime = pd.Timestamp(end_date, tz="UTC") + pd.Timedelta(days=1)
 
     filtered_df = filtered_df[
         (filtered_df["detected_at"] >= start_datetime)
